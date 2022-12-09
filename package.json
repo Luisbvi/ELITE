@@ -1,16 +1,16 @@
 {
-  "name": "osrs-services",
-  "version": "1.0.0",
+  "name": "elite",
+  "version": "1.6.0",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "start": "tsc && node dist/index.ts",
+    "start": "node dist/index.js",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "prod": "node dist/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Luisbvi",
   "license": "ISC",
   "dependencies": {
     "colors": "1.4.0",
