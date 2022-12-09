@@ -2,9 +2,9 @@
   "name": "osrs-services",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/index.ts",
+    "start": "node dist/index.ts",
     "dev": "ts-node-dev src/index.ts",
     "build": "tsc",
     "prod": "node dist/index.js"
