@@ -46,7 +46,6 @@ export class ExtendedClient extends Client {
     await this.registerModules();
 
     // DB
-
     await this.connectToDB()
 
     // Login

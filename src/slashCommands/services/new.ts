@@ -5,121 +5,110 @@ import {
   ButtonStyle,
   ComponentType,
   EmbedBuilder,
+  PermissionFlagsBits,
+  SlashCommandBuilder,
   TextChannel,
 } from "discord.js";
 import { CustomerModel } from "../../schema/customer";
 import { jobModel } from "../../schema/job";
 import SlashCommand from "../../structures/classes/SlashCommand";
 import { GuildModel } from "../../schema/guild";
-import guild from "../owner/guild";
 
 export default new SlashCommand({
-  name: "new",
-  description: "Create new job",
-  defaultMemberPermissions: "Administrator",
-  options: [
-    {
-      name: "customer",
-      description: "...",
-      type: ApplicationCommandOptionType.User,
-      required: true,
-    },
-    {
-      name: "details",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      required: true,
-    },
-    {
-      name: "price",
-      description: "...",
-      type: ApplicationCommandOptionType.Number,
-      required: true,
-      min_value: 1,
-    },
-    {
-      name: "account",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      required: true,
-      choices: [
-        {
-          name: "Regular",
-          value: "regular",
-        },
-        {
-          name: "Ironman",
-          value: "ironman",
-        },
-        {
-          name: "Hardcore",
-          value: "hardcore",
-        },
-        {
-          name: "Pure",
-          value: "pure",
-        },
-      ],
-    },
-    {
-      name: "tier",
-      description: "...",
-      type: ApplicationCommandOptionType.Role,
-      required: true,
-    },
-
-    {
-      name: "eta",
-      description: "Estimate Time Arrive in HOURS",
-      type: ApplicationCommandOptionType.Number,
-      required: true,
-    },
-    {
-      name: "warranty",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      choices: [
-        {
-          name: "Yes",
-          value: "yes",
-        },
-        {
-          name: "No",
-          value: "no",
-        },
-      ],
-      required: true,
-    },
-    {
-      name: "user",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      required: true,
-      min_length: 1,
-    },
-    {
-      name: "pass",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      min_length: 1,
-      required: true,
-    },
-    {
-      name: "bankpin",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      min_length: 4,
-      max_length: 4,
-      required: false,
-    },
-    {
-      name: "stats",
-      description: "url of the stats",
-      type: ApplicationCommandOptionType.Attachment,
-      required: false,
-    },
-  ],
-
+  data: new SlashCommandBuilder()
+    .setName("new")
+    .setDescription("Create new job")
+    .addUserOption((option) =>
+      option.setName("customer").setDescription("...").setRequired(true)
+    )
+    .addStringOption((option) =>
+      option.setName("details").setDescription("...").setRequired(true)
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("price")
+        .setDescription("...")
+        .setRequired(true)
+        .setMinValue(1)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("account")
+        .setDescription("...")
+        .setRequired(true)
+        .addChoices(
+          {
+            name: "Regular",
+            value: "regular",
+          },
+          {
+            name: "Ironman",
+            value: "ironman",
+          },
+          {
+            name: "Hardcore",
+            value: "hardcore",
+          },
+          {
+            name: "Pure",
+            value: "pure",
+          }
+        )
+    )
+    .addRoleOption((option) =>
+      option.setName("tier").setDescription("...").setRequired(true)
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("eta")
+        .setDescription("Estimate Time Arrive in HOURS")
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("warranty")
+        .setDescription("...")
+        .setRequired(true)
+        .addChoices(
+          {
+            name: "Yes",
+            value: "yes",
+          },
+          {
+            name: "No",
+            value: "no",
+          }
+        )
+    )
+    .addStringOption((option) =>
+      option
+        .setName("user")
+        .setDescription("...")
+        .setRequired(true)
+        .setMinLength(1)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("pass")
+        .setDescription("...")
+        .setMinLength(1)
+        .setRequired(true)
+    )
+    .addStringOption((option) =>
+      option
+        .setName("bankpin")
+        .setDescription("...")
+        .setRequired(false)
+        .setMinLength(4)
+        .setMaxLength(4)
+    )
+    .addAttachmentOption((option) =>
+      option
+        .setName("stats")
+        .setDescription("url of the stats")
+        .setRequired(false)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
   async run({ interaction, args }) {
     await interaction.deferReply({ ephemeral: true });
     const embed = new EmbedBuilder({}).setColor("#36393F");
@@ -128,9 +117,9 @@ export default new SlashCommand({
     });
 
     const customer = args.getUser("customer");
-    const accountType = args.getString("account");
     const details = args.getString("details");
     const price = args.getNumber("price");
+    const accountType = args.getString("account");
     const tier = args.getRole("tier");
     const eta = Math.floor(Date.now() / 1000) + args.getNumber("eta") * 3600;
     const accountStats = args.getString("stats");

@@ -43,19 +43,7 @@ export default new Event("interactionCreate", async (interaction) => {
           });
       }
 
-      if (
-        command.permission &&
-        !interaction.guild.members.cache
-          .get(interaction.user.id)
-          .permissions.has(command.permission)
-      ) {
-        await interaction.deferReply({ ephemeral: true });
-        return interaction.editReply({
-          content: `:x: **You need the following persmissions to execute this command**\n${command.permission
-            .map((permission) => `\`${permission}\``)
-            .join(", ")}`,
-        });
-      }
+
     }
 
     try {

@@ -16,7 +16,7 @@ export default new Event("messageCreate", (message) => {
 
   if (command) {
     if (command.owner) {
-      const owners = process.env.owners.split(" ");
+      const owners = process.env.owners.split(/ +/g);
 
       if (!owners.includes(message.author.id))
         return message.reply({

@@ -1,7 +1,5 @@
 import { glob } from "glob";
 import { promisify } from "util";
-import { ExtendedClient } from "../classes/Client";
-import { IRegisterCommands } from "../interfaces/Client";
 
 const PG = promisify(glob);
 

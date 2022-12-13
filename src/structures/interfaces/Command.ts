@@ -1,6 +1,5 @@
 import { Message, PermissionsString } from "discord.js";
 import { ExtendedClient } from "../classes/Client";
-import { ExtendedInteraction } from "./SlashCommand";
 
 interface CommandArgs {
   name: string;

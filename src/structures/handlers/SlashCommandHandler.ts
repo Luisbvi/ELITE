@@ -19,10 +19,10 @@ export class SlashCommandHandler {
               commandPath
             );
 
-            if (!slashCommand.name) return;
+            if (!slashCommand.data.name) return;
 
-            client.slashCommand.set(slashCommand.name, slashCommand);
-            slashCommands.push(slashCommand);
+            client.slashCommand.set(slashCommand.data.name, slashCommand);
+            slashCommands.push(slashCommand.data);
             client.application?.commands.set(slashCommands);
           } catch (error) {
             console.log(`ERROR LOADING FILE ${commandPath}`.bgRed);
@@ -35,7 +35,7 @@ export class SlashCommandHandler {
     const rest = new REST({ version: "10" }).setToken(process.env.botToken);
     await (async () => {
       try {
-        const data = rest.put(
+        rest.put(
           Routes.applicationGuildCommands(
             process.env.clientId,
             process.env.guildId

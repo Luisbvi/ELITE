@@ -1,28 +1,27 @@
-import { ApplicationCommandOptionType } from "discord.js";
+import {
+  PermissionFlagsBits,
+  SlashCommandBuilder,
+} from "discord.js";
 import SlashCommand from "../../structures/classes/SlashCommand";
 
 export default new SlashCommand({
-    name: "emit",
-    description: "emit an event",
-    defaultMemberPermissions: "Administrator",
-    options: [
-      {
-        name: "event",
-        description: "event to emit",
-        type: ApplicationCommandOptionType.String,
-        choices: [
-          {
-            name: "guildMemberAdd",
-            value: "guildMemberAdd",
-          },
-        ],
-        required: true,
-      },
-    ],
+  data: new SlashCommandBuilder()
+    .setName("emit")
+    .setDescription("emit an event")
+    .addStringOption((option) =>
+      option
+        .setName("event")
+        .setDescription("event to emit")
+        .addChoices({
+          name: "guildMemberAdd",
+          value: "guildMemberAdd",
+        })
+        .setRequired(true)
+    )
+    .setDefaultMemberPermissions(PermissionFlagsBits.Administrator),
 
-    run: ({ interaction, client, args }) => {
-      const eventToEmit = args.getString("event");
-      client.emit(eventToEmit, interaction.member);
-    },
-    
-  });
+  run: ({ interaction, client, args }) => {
+    const eventToEmit = args.getString("event");
+    client.emit(eventToEmit, interaction.member);
+  },
+});

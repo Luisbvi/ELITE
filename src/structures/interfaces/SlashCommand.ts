@@ -1,9 +1,10 @@
 import {
   CommandInteraction,
   CommandInteractionOptionResolver,
-  ChatInputApplicationCommandData,
   GuildMember,
   PermissionsString,
+  SlashCommandBuilder,
+  SharedNameAndDescription,
 } from "discord.js";
 import { ExtendedClient } from "../classes/Client";
 
@@ -16,12 +17,12 @@ interface RunOptions {
 type RunFuction = (options: RunOptions) => any;
 
 export type SlashCommandType = {
+  data: SlashCommandBuilder | SharedNameAndDescription;
   cooldown?: number;
   owner?: boolean;
-  permission?: PermissionsString[];
   botPermissions?: PermissionsString[];
   run: RunFuction;
-} & ChatInputApplicationCommandData;
+};
 
 export interface ExtendedInteraction extends CommandInteraction {
   member: GuildMember;

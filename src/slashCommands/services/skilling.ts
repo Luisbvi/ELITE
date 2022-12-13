@@ -1,118 +1,121 @@
-import { ApplicationCommandOptionType, EmbedBuilder } from "discord.js";
+import {
+  ApplicationCommandOptionType,
+  EmbedBuilder,
+  SlashCommandBuilder,
+} from "discord.js";
 import { GuildModel } from "../../schema/guild";
 import { SkillModel } from "../../schema/skills";
 import SlashCommand from "../../structures/classes/SlashCommand";
 import { numberWithCommas, xpTable } from "../../structures/utils/Utils";
 
 export default new SlashCommand({
-  name: "skilling",
-  description: "Skill Quote",
-  options: [
-    {
-      name: "skill",
-      description: "...",
-      type: ApplicationCommandOptionType.String,
-      choices: [
-        {
-          name: "Agility",
-          value: "Agility",
-        },
-        {
-          name: "Combat",
-          value: "Combat",
-        },
-        {
-          name: "Construction",
-          value: "Construction",
-        },
-        {
-          name: "Cooking",
-          value: "Cooking",
-        },
-        {
-          name: "Crafting",
-          value: "Crafting",
-        },
-        {
-          name: "Farming",
-          value: "Farming",
-        },
-        {
-          name: "Firemaking",
-          value: "Firemaking",
-        },
-        {
-          name: "Fishing",
-          value: "Fishing",
-        },
-        {
-          name: "Fletching",
-          value: "Fletching",
-        },
-        {
-          name: "Herblore",
-          value: "Herblore",
-        },
-        {
-          name: "Hunter",
-          value: "Hunter",
-        },
-        {
-          name: "Magic",
-          value: "Magic",
-        },
-        {
-          name: "Mining",
-          value: "Mining",
-        },
-        {
-          name: "Prayer",
-          value: "Prayer",
-        },
-        {
-          name: "Ranged",
-          value: "Ranged",
-        },
-        {
-          name: "Runecrafting",
-          value: "Runecrafting",
-        },
-        {
-          name: "Slayer",
-          value: "Slayer",
-        },
-        {
-          name: "Smithing",
-          value: "Smithing",
-        },
-        {
-          name: "Thieving",
-          value: "Thieving",
-        },
-        {
-          name: "Woodcutting",
-          value: "Woodcutting",
-        },
-      ],
-      required: true,
-    },
-    {
-      name: "start",
-      description: "...",
-      type: ApplicationCommandOptionType.Number,
-      min_value: 1,
-      max_value: 98,
-      required: true,
-    },
-    {
-      name: "stop",
-      description: "...",
-      type: ApplicationCommandOptionType.Number,
-      min_value: 2,
-      max_value: 99,
-      required: true,
-    },
-  ],
+  data: new SlashCommandBuilder()
+    .setName("skilling")
+    .setDescription("Skill Quote")
+    .addStringOption((option) =>
+      option
+        .setName("skill")
+        .setDescription("...")
+        .addChoices(
+          {
+            name: "Agility",
+            value: "Agility",
+          },
+          {
+            name: "Combat",
+            value: "Combat",
+          },
+          {
+            name: "Construction",
+            value: "Construction",
+          },
+          {
+            name: "Cooking",
+            value: "Cooking",
+          },
+          {
+            name: "Crafting",
+            value: "Crafting",
+          },
+          {
+            name: "Farming",
+            value: "Farming",
+          },
+          {
+            name: "Firemaking",
+            value: "Firemaking",
+          },
+          {
+            name: "Fishing",
+            value: "Fishing",
+          },
+          {
+            name: "Fletching",
+            value: "Fletching",
+          },
+          {
+            name: "Herblore",
+            value: "Herblore",
+          },
+          {
+            name: "Hunter",
+            value: "Hunter",
+          },
+          {
+            name: "Magic",
+            value: "Magic",
+          },
+          {
+            name: "Mining",
+            value: "Mining",
+          },
+          {
+            name: "Prayer",
+            value: "Prayer",
+          },
+          {
+            name: "Ranged",
+            value: "Ranged",
+          },
+          {
+            name: "Runecrafting",
+            value: "Runecrafting",
+          },
+          {
+            name: "Slayer",
+            value: "Slayer",
+          },
+          {
+            name: "Smithing",
+            value: "Smithing",
+          },
+          {
+            name: "Thieving",
+            value: "Thieving",
+          },
+          {
+            name: "Woodcutting",
+            value: "Woodcutting",
+          }
+        )
+        .setRequired(true)
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("start")
+        .setDescription("...")
+        .setMaxValue(98)
+        .setMinValue(1)
+        .setRequired(true)
+    )
+    .addNumberOption((option) =>
+      option
+        .setName("stop")
+        .setDescription("...")
+        .setRequired(true)
+        .setMinValue(2)
+        .setMaxValue(99)
+    ),
 
   async run({ interaction, args }) {
     await interaction.deferReply({ ephemeral: true });
