@@ -8,6 +8,7 @@ import {
   EmbedBuilder,
   GuildMember,
   PermissionFlagsBits,
+  TextBasedChannel,
   TextChannel,
 } from "discord.js";
 import { client } from "../..";
@@ -17,6 +18,8 @@ import { ExtendedInteraction } from "../../structures/interfaces/SlashCommand";
 import { createTranscript } from "discord-html-transcripts";
 import { WorkerModel } from "../../schema/worker";
 import { jobModel } from "../../schema/job";
+import { GuildModel } from "../../schema/guild";
+import { connection } from "mongoose";
 
 export default new Event("interactionCreate", async (interaction) => {
   if (interaction.isChatInputCommand()) {
@@ -42,8 +45,6 @@ export default new Event("interactionCreate", async (interaction) => {
               .join(", ")}`,
           });
       }
-
-
     }
 
     try {
@@ -274,6 +275,41 @@ export default new Event("interactionCreate", async (interaction) => {
       "cancel-close": async () => {
         await interaction.update({});
         interaction.message.delete();
+      },
+
+      ping: async () => {
+        await interaction.reply({
+          content: "Fetching data...",
+          ephemeral: true,
+        });
+        const status = [
+          "Disconnected",
+          "Connected",
+          "Connecting",
+          "Disconnecting",
+        ];
+        await interaction.client.user.fetch();
+        await interaction.client.application.fetch();
+        const embed = new EmbedBuilder({
+          title: `${interaction.client.user.username}'s status`,
+          thumbnail: {
+            url: interaction.client.user.displayAvatarURL({ size: 1024 }),
+          },
+          fields: [
+            {
+              name: "System",
+              value: [
+                `⏰ **Up Since** <t:${parseInt(
+                  (interaction.client.readyTimestamp / 1000).toFixed(0)
+                )}:R>`,
+                `🏓 **Ping** ${interaction.client.ws.ping}ms`,
+                `📚 **Database** ${status[connection.readyState]}`,
+              ].join("\n"),
+              inline: true,
+            },
+          ],
+        }).setColor(interaction.guild.members.me.roles.highest.hexColor);
+        interaction.editReply({ content: "", embeds: [embed] });
       },
 
       delete: async () => {
@@ -540,6 +576,98 @@ export default new Event("interactionCreate", async (interaction) => {
       ? buttons[buttonId]()
       : interaction.reply({
           content: ":x: This button isn't implemented yet!",
+          ephemeral: true,
+        });
+  }
+
+  if (interaction.isStringSelectMenu()) {
+    const guildData = await GuildModel.findOne({
+      id: interaction.guildId,
+    });
+    const menuId = interaction.customId;
+    const menus = {
+      services: async () => {
+        await interaction.deferReply({ ephemeral: true });
+        interaction.editReply({ content: "Creating ticket..." });
+
+        await interaction.guild.channels
+          .create({
+            name: `${interaction.user.username}-${guildData.orderNumbers}`,
+            permissionOverwrites: [
+              {
+                id: interaction.user.id,
+                allow: [
+                  PermissionFlagsBits.ViewChannel,
+                  PermissionFlagsBits.SendMessages,
+                  PermissionFlagsBits.ReadMessageHistory,
+                ],
+              },
+              {
+                id: interaction.guild.roles.everyone.id,
+                deny: [
+                  PermissionFlagsBits.ViewChannel,
+                  PermissionFlagsBits.SendMessages,
+                  PermissionFlagsBits.ReadMessageHistory,
+                ],
+              },
+            ],
+            parent: "931321786472210442",
+          })
+          .then(async (channel) => {
+           await  TicketModel.create({
+              channelId: channel.id,
+              guildId: interaction.guild.id,
+              memberId: interaction.user.id,
+              closed: false,
+              locked: false,
+              type: interaction.customId,
+            });
+            const orderNumber = (parseInt(guildData.orderNumbers) + 1)
+              .toString()
+              .padStart(4, "0");
+            const embed = new EmbedBuilder()
+              .setDescription(
+                `**Ticket for: ${interaction.values[0]}**\n\nSupport will assist you shortly. In the meantime, please check out our main website https://bottinghub.com/`
+              )
+              .setFooter({
+                text: `${interaction.guild.name}`,
+                iconURL: interaction.guild.iconURL(),
+              })
+              .setColor("White");
+
+            const Buttons = new ActionRowBuilder<ButtonBuilder>({
+              components: [
+                {
+                  customId: "close",
+                  label: "Close",
+                  style: ButtonStyle.Secondary,
+                  emoji: "🔒",
+                  type: ComponentType.Button,
+                },
+              ],
+            });
+            channel.send({
+              content: `${interaction.member} - <@&1048822484062982256>`,
+              embeds: [embed],
+              components: [Buttons],
+            });
+
+            await GuildModel.updateOne(
+              { guildId: interaction.guildId },
+              { orderNumbers: orderNumber }
+            );
+
+            return interaction.editReply({
+              content: `${interaction.member} your ticket has been created: ${channel}`,
+            });
+          });
+      },
+    };
+
+    menus[menuId]
+      ? menus[menuId]()
+      : interaction.reply({
+          content: "This select menu isn't available yet",
           ephemeral: true,
         });
   }

@@ -5,6 +5,7 @@ interface IQuest {
     {
       name: string;
       price: number;
+      alias?: [string];
     }
   ];
   id: string;
@@ -15,6 +16,7 @@ const QuestSchema = new Schema<IQuest>({
     {
       name: String,
       price: Number,
+      alias: [String],
     },
   ],
   id: String,

@@ -1,4 +1,5 @@
 import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { GuildModel } from "../../schema/guild";
 import { QuestModel } from "../../schema/quest";
 import SlashCommand from "../../structures/classes/SlashCommand";
 
@@ -31,14 +32,28 @@ export default new SlashCommand({
     )?.id;
     const discount: number = discountRoles[discountRol];
 
+    const rate = await GuildModel.findOne({ guildId: interaction.guildId })[
+      "07gp"
+    ];
+
     const questData = (await QuestModel.findOne()).quests;
 
-    const questRequired = questData.filter((quest) => {
-      questsChoices.includes(quest.name.toLowerCase());
+    const quests = questsChoices.map((choice) => {
+      return questData.find((quest) => {
+        return (
+          quest.name.toLowerCase() === choice ||
+          quest.alias.find((questname) => questname.toLowerCase() === choice)
+        );
+      });
     });
 
-    console.log(questRequired);
     let price = 0;
+
+    quests.forEach((quest) => {
+      price += quest?.price ?? 0;
+    });
+
+    const totalgold = price / rate;
 
     const embed = new EmbedBuilder()
       .setAuthor({
@@ -47,17 +62,42 @@ export default new SlashCommand({
           "https://oldschool.runescape.wiki/images/thumb/Quests.png/130px-Quests.png?f5120",
       })
       .setColor("White")
-      .addFields({
+      .setFooter({
+        text: interaction.guild.name,
+        iconURL: interaction.guild.iconURL(),
+      })
+      .setThumbnail(interaction.guild.iconURL());
+
+    embed.addFields(
+      {
+        name: "__Quest Requested__",
+        value: `${quests
+          .map((quest) => quest?.name ?? "Unknow Quest")
+          .join("\n")}`,
+      },
+      {
         name: "Discount",
         value: discount ? `\`${discount} has been applied \`` : "`No Discount`",
-      });
-
-    questsChoices.forEach((quest) => {
-      embed.addFields({
-        name: "Quest Requested",
-        value: "test",
-      });
-    });
+      },
+      {
+        name: `<:coins_icon:853392355067035709> ${
+          discount
+            ? (totalgold - (totalgold * discount) / 100).toFixed(3)
+            : totalgold.toFixed(3)
+        }M`,
+        value: "\u200B",
+        inline: true,
+      },
+      {
+        name: `<:BTC:853398763392466944> ${
+          discount
+            ? (price - (price * discount) / 100).toFixed(2)
+            : price.toFixed(2)
+        }$`,
+        value: "\u200B",
+        inline: true,
+      }
+    );
 
     interaction.editReply({ embeds: [embed] });
   },

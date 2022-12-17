@@ -267,11 +267,6 @@ export default new SlashCommand({
       ],
     });
 
-    await GuildModel.updateOne(
-      { guildId: interaction.guildId },
-      { orderNumbers: orderNumber }
-    );
-
     const CustomerData = await CustomerModel.findOne({
       customerId: customer.id,
     });
