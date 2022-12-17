@@ -1,23 +1,15 @@
-import { EmbedBuilder, SlashCommandBuilder } from "discord.js";
+import { EmbedBuilder } from "discord.js";
 import { GuildModel } from "../../schema/guild";
 import { QuestModel } from "../../schema/quest";
-import SlashCommand from "../../structures/classes/SlashCommand";
+import PrefixCommand from "../../structures/classes/PrefixCommand";
 
-export default new SlashCommand({
-  data: new SlashCommandBuilder()
-    .setName("quest")
-    .setDescription("Quote Quest")
-    .addStringOption((option) =>
-      option.setName("quest_choices").setDescription("...").setRequired(true)
-    ),
-  async run({ interaction, args }) {
-    await interaction.deferReply({ ephemeral: true });
-    const questsChoices = args
-      .getString("quest_choices")
-      .split(",")
-      .map((quest) => quest.trim().toLowerCase());
+export default new PrefixCommand({
+  name: "q",
+  async run({ message }) {
+    const args = message.content.slice(2).trim().split(",");
+    const questsChoices = args.map((quest) => quest.trim().toLowerCase());
 
-    const customer = interaction.member;
+    const customer = message.member;
 
     const discountRoles = {
       "856961746896289793": 2,
@@ -32,9 +24,7 @@ export default new SlashCommand({
     )?.id;
     const discount: number = discountRoles[discountRol];
 
-    const guildData = await GuildModel.findOne({
-      guildId: interaction.guildId,
-    });
+    const guildData = await GuildModel.findOne({ guildId: message.guildId });
 
     const questData = (await QuestModel.findOne()).quests;
 
@@ -63,10 +53,10 @@ export default new SlashCommand({
       })
       .setColor("White")
       .setFooter({
-        text: interaction.guild.name,
-        iconURL: interaction.guild.iconURL(),
+        text: message.guild.name,
+        iconURL: message.guild.iconURL(),
       })
-      .setThumbnail(interaction.guild.iconURL());
+      .setThumbnail(message.guild.iconURL());
 
     embed.addFields(
       {
@@ -99,6 +89,6 @@ export default new SlashCommand({
       }
     );
 
-    interaction.editReply({ embeds: [embed] });
+    message.channel.send({ embeds: [embed] });
   },
 });
